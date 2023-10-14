@@ -1,46 +1,74 @@
-'use client'
+import Image from "next/image";
+import { useContext, useEffect } from 'react';
+import { CounterContext } from '../utils/ContextApiProvider';
+import isUserFollowed from "../utils/isUserFollowed";
 
-import Image from "next/image"
+function Main ({click, onFollow, following, setFollowing})  {
+  const { userData } = useContext(CounterContext);
+  const followed = isUserFollowed();
 
-function Main ({click, userData})  {
+  function handleFollow() {
+    onFollow();
+  }
 
-  const image = userData.picture.thumbnail
+
+  const image = userData?.picture?.thumbnail;
+  const largeImage = userData?.picture?.large;
+  const fullName = `${userData?.name?.first} ${userData?.name?.last}`;
+  const location = `${userData?.location?.city}, ${userData?.location?.state}`;
+
+   function handleClearLocalStorage() {
+    localStorage.removeItem('savedPerson');
+  }
+
   return ( 
-    <div className="bg-white w-[100%] h-[26rem] md:h-[24rem]">
-
-        <Image
-          src={image}
-          alt='perfil image'
-          width={5200}
-          height={100}
-          className={`h-32 object-cover object-center`}
-        />
-
+    <div className="bg-white w-full h-26rem md:h-24rem">
+      <Image
+        src={image}
+        alt='perfil image'
+        width={5200}
+        height={100}
+        className="h-32 object-cover object-center"
+      />
 
       <Image 
-        src={userData.picture.large}
+        src={largeImage}
         alt='perfil image'
-        width='180'
-        height='180'
+        width={180}
+        height={180}
         className="mx-auto relative -top-24 rounded-full"
       />
 
-      <div className="flex flex-col md:flex-row  justify-center -top-20 relative px-8 md:px-0">
-          <button className="bg-[#9022F3] px-8 py-2 rounded-md text-white mb-2 md:mb-0">Follow
-          </button>
-          <button
+      <div className="flex flex-col md:flex-row justify-center -top-20 relative px-8 md:px-0">
+        <button
+          onClick={handleFollow}
+          className={` bg-[#9022F3] px-8 py-2 rounded-md text-white mb-2 md:mb-0
+
+          ${
+            !followed
+              ? 'hover:bg-green-600'
+              : 'hover:bg-red-600'
+          }`}
+        >
+          {followed ? 'unFollow' : 'Follow'}
+        </button>
+        <button
           onClick={click}
-          className="border border-gray-300 shadow md:absolute right-0 px-4 py-1 rounded-md md:mr-2 font-bold">
+          className="border border-gray-300 shadow md:absolute right-0 px-4 py-1 rounded-md md:mr-2 font-bold"
+        >
           Try the next one
-          </button>
+        </button>
       </div>
 
-    <div className="flex flex-col items-center justify-center mt-4 font-bold relative -top-20">
-      <p className="text-4xl">{userData.name.first} {userData.name.last}</p>
-      <p>{userData.location.city}, {userData.location.state}</p>
+      <div className="flex flex-col items-center justify-center mt-4 font-bold relative -top-20">
+        <p className="text-4xl">{fullName}</p>
+        <p>{location}</p>
+      </div>
+      <button
+        onClick={handleClearLocalStorage}
+      >Clear</button>
     </div>
-    </div>
-  )
+  );
 }
 
-export default Main
+export default Main;
